@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Library Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h2 {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s;
+            gap: 10px;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+        
+        .sidebar-menu i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .top-header {
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 99;
+        }
+        
+        .language-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .language-flag {
+            width: 30px;
+            height: 20px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .language-flag:hover, .language-flag.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            margin: 25px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Form Styles */
+        .form-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e8f4f2;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            margin-right: 5px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+        }
+        
+        .delete-btn:hover {
+            background-color: #d1144a;
+        }
+        
+        /* Stats Cards */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(to right, var(--primary), var(--success));
+            border-radius: 12px;
+            padding: 25px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .stat-card p {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        /* Cloud Features Section */
+        .cloud-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .sidebar-menu li {
+                flex: 0 0 auto;
+                margin-bottom: 0;
+            }
+            
+            .sidebar-menu a {
+                padding: 15px 20px;
+                white-space: nowrap;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-header {
+                padding: 0 15px;
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+            }
+            
+            .language-selector {
+                margin-top: 10px;
+            }
+        }
+        
+        /* Dark Mode Support */
+        .dark-mode {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: #f5f5f5;
+        }
+        
+        .dark-mode .sidebar,
+        .dark-mode .top-header,
+        .dark-mode .content-area,
+        .dark-mode .form-container,
+        .dark-mode .feature-card,
+        .dark-mode table {
+            background: rgba(45, 45, 45, 0.95);
+            color: #f5f5f5;
+        }
+        
+        .dark-mode input,
+        .dark-mode select {
+            background: #333;
+            color: #f5f5f5;
+            border-color: #555;
+        }
+        
+        .dark-mode .sidebar-menu a {
+            color: #f5f5f5;
+        }
+        
+        .dark-mode h2 {
+            color: #4cc9f0;
+        }
+        
+        .dark-mode tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+        
+        .dark-mode tr:hover {
+            background-color: #3a3a3a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book-reader"></i> Global Library</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" data-tab="dashboard"><i class="fas fa-chart-bar"></i> <span data-i18n="dashboard">Dashboard</span></a></li>
+                <li><a href="#" data-tab="students"><i class="fas fa-user-graduate"></i> <span data-i18n="students">Students</span></a></li>
+                <li><a href="#" data-tab="managers"><i class="fas fa-user-tie"></i> <span data-i18n="managers">Managers</span></a></li>
+                <li><a href="#" data-tab="books"><i class="fas fa-book"></i> <span data-i18n="books">Books</span></a></li>
+                <li><a href="#" data-tab="cloud"><i class="fas fa-cloud"></i> <span data-i18n="cloudFeatures">Cloud Features</span></a></li>
+                <li><a href="#" data-tab="settings"><i class="fas fa-cog"></i> <span data-i18n="settings">Settings</span></a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="top-header">
+                <h1 data-i18n="librarySystem">Library Management System</h1>
+                <div class="language-selector">
+                    <img src="https://flagcdn.com/w40/us.png" class="language-flag active" data-lang="en" alt="English">
+                    <img src="https://flagcdn.com/w40/es.png" class="language-flag" data-lang="es" alt="Español">
+                    <img src="https://flagcdn.com/w40/fr.png" class="language-flag" data-lang="fr" alt="Français">
+                    <img src="https://flagcdn.com/w40/de.png" class="language-flag" data-lang="de" alt="Deutsch">
+                    <img src="https://flagcdn.com/w40/cn.png" class="language-flag" data-lang="zh" alt="中文">
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2><i class="fas fa-chart-bar"></i> <span data-i18n="dashboard">Dashboard</span></h2>
+                    <div class="stats">
+                        <div class="stat-card">
+                            <h3 data-i18n="totalStudents">Total Students</h3>
+                            <p id="total-students">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="totalManagers">Total Managers</h3>
+                            <p id="total-managers">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="totalBooks">Total Books</h3>
+                            <p id="total-books">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 data-i18n="borrowedBooks">Borrowed Books</h3>
+                            <p id="borrowed-books">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Tab -->
+                <div id="students" class="tab-content">
+                    <h2><i class="fas fa-user-graduate"></i> <span data-i18n="studentManagement">Student Management</span></h2>
+                    <div class="form-container">
+                        <form id="student-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="student-name"><i class="fas fa-user"></i> <span data-i18n="fullName">Full Name</span></label>
+                                    <input type="text" id="student-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-id"><i class="fas fa-id-card"></i> <span data-i18n="studentId">Student ID</span></label>
+                                    <input type="text" id="student-id" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-email"><i class="fas fa-envelope"></i> <span data-i18n="email">Email</span></label>
+                                    <input type="email" id="student-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="student-course"><i class="fas fa-graduation-cap"></i> <span data-i18n="courseProgram">Course/Program</span></label>
+                                    <input type="text" id="student-course" required>
+                                </div>
+                            </div>
+                            <button type="submit"><i class="fas fa-plus-circle"></i> <span data-i18n="addStudent">Add Student</span></button>
+                        </form>
+                    </div>
+
+                    <h2><i class="fas fa-list"></i> <span data-i18n="studentList">Student List</span></h2>
+                    <div class="table-container">
+                        <table id="students-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="id">ID</th>
+                                    <th data-i18n="name">Name</th>
+                                    <th data-i18n="email">Email</th>
+                                    <th data-i18n="course">Course</th>
+                                    <th data-i18n="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Student data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Managers Tab -->
+                <div id="managers" class="tab-content">
+                    <h2><i class="fas fa-user-tie"></i> <span data-i18n="managerManagement">Manager Management</span></h2>
+                    <div class="form-container">
+                        <form id="manager-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="manager-name"><i class="fas fa-user"></i> <span data-i18n="fullName">Full Name</span></label>
+                                    <input type="text" id="manager-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="manager-id"><i class="fas fa-id-card"></i> <span data-i18n="managerId">Manager ID</span></label>
+                                    <input type="text" id="manager-id" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="manager-email"><i class="fas fa-envelope"></i> <span data-i18n="email">Email</span></label>
+                                    <input type="email" id="manager-email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="manager-department"><i class="fas fa-building"></i> <span data-i18n="department">Department</span></label>
+                                    <input type="text" id="manager-department" required>
+                                </div>
+                            </div>
+                            <button type="submit"><i class="fas fa-plus-circle"></i> <span data-i18n="addManager">Add Manager</span></button>
+                        </form>
+                    </div>
+
+                    <h2><i class="fas fa-list"></i> <span data-i18n="managerList">Manager List</span></h2>
+                    <div class="table-container">
+                        <table id="managers-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="id">ID</th>
+                                    <th data-i18n="name">Name</th>
+                                    <th data-i18n="email">Email</th>
+                                    <th data-i18n="department">Department</th>
+                                    <th data-i18n="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Manager data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Books Tab -->
+                <div id="books" class="tab-content">
+                    <h2><i class="fas fa-book"></i> <span data-i18n="bookManagement">Book Management</span></h2>
+                    <div class="form-container">
+                        <form id="book-form">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="book-title"><i class="fas fa-book"></i> <span data-i18n="title">Title</span></label>
+                                    <input type="text" id="book-title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="book-author"><i class="fas fa-user-edit"></i> <span data-i18n="author">Author</span></label>
+                                    <input type="text" id="book-author" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="book-isbn"><i class="fas fa-barcode"></i> <span data-i18n="isbn">ISBN</span></label>
+                                    <input type="text" id="book-isbn" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="book-category"><i class="fas fa-tag"></i> <span data-i18n="category">Category</span></label>
+                                    <select id="book-category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fiction">Non-Fiction</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Technology">Technology</option>
+                                        <option value="History">History</option>
+                                        <option value="Art">Art</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit"><i class="fas fa-plus-circle"></i> <span data-i18n="addBook">Add Book</span></button>
+                        </form>
+                    </div>
+
+                    <h2><i class="fas fa-list"></i> <span data-i18n="bookInventory">Book Inventory</span></h2>
+                    <div class="table-container">
+                        <table id="books-table">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="isbn">ISBN</th>
+                                    <th data-i18n="title">Title</th>
+                                    <th data-i18n="author">Author</th>
+                                    <th data-i18n="category">Category</th>
+                                    <th data-i18n="status">Status</th>
+                                    <th data-i18n="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Book data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Cloud Features Tab -->
+                <div id="cloud" class="tab-content">
+                    <h2><i class="fas fa-cloud"></i> <span data-i18n="cloudFeatures">Cloud Features</span></h2>
+                    <div class="cloud-features">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3 data-i18n="multiTenant">Multi-Tenant Architecture</h3>
+                            <p data-i18n="multiTenantDesc">Support for multiple libraries with isolated data and configurations.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-language"></i>
+                            </div>
+                            <h3 data-i18n="multiLanguage">Multi-Language Support</h3>
+                            <p data-i18n="multiLanguageDesc">Interface available in multiple languages for global accessibility.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3 data-i18n="highPerformance">High Performance</h3>
+                            <p data-i18n="highPerformanceDesc">Optimized for large datasets with efficient memory management.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 data-i18n="dataSecurity">Data Security</h3>
+                            <p data-i18n="dataSecurityDesc">Advanced encryption and security protocols for data protection.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-sync"></i>
+                            </div>
+                            <h3 data-i18n="autoScaling">Auto Scaling</h3>
+                            <p data-i18n="autoScalingDesc">Automatically scales resources based on demand and usage patterns.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h3 data-i18n="bigData">Big Data Ready</h3>
+                            <p data-i18n="bigDataDesc">Handles large volumes of data with optimized storage and retrieval.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-content">
+                    <h2><i class="fas fa-cog"></i> <span data-i18n="systemSettings">System Settings</span></h2>
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="theme-selector"><i class="fas fa-palette"></i> <span data-i18n="theme">Theme</span></label>
+                            <select id="theme-selector">
+                                <option value="light" data-i18n="lightMode">Light Mode</option>
+                                <option value="dark" data-i18n="darkMode">Dark Mode</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="data-export"><i class="fas fa-file-export"></i> <span data-i18n="dataManagement">Data Management</span></label>
+                            <div>
+                                <button type="button" id="export-data"><i class="fas fa-download"></i> <span data-i18n="exportData">Export Data</span></button>
+                                <button type="button" id="import-data"><i class="fas fa-upload"></i> <span data-i18n="importData">Import Data</span></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="system-info"><i class="fas fa-info-circle"></i> <span data-i18n="systemInfo">System Information</span></label>
+                            <div id="system-info" class="system-info">
+                                <p><span data-i18n="version">Version</span>: 2.0.0</p>
+                                <p><span data-i18n="lastBackup">Last Backup</span>: <span id="last-backup">Never</span></p>
+                                <p><span data-i18n="storageUsed">Storage Used</span>: <span id="storage-used">0 KB</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Internationalization (i18n) Support
+        const translations = {
+            en: {
+                // Dashboard
+                "dashboard": "Dashboard",
+                "totalStudents": "Total Students",
+                "totalManagers": "Total Managers",
+                "totalBooks": "Total Books",
+                "borrowedBooks": "Borrowed Books",
+                
+                // Students
+                "studentManagement": "Student Management",
+                "fullName": "Full Name",
+                "studentId": "Student ID",
+                "email": "Email",
+                "courseProgram": "Course/Program",
+                "addStudent": "Add Student",
+                "studentList": "Student List",
+                
+                // Managers
+                "managerManagement": "Manager Management",
+                "managerId": "Manager ID",
+                "department": "Department",
+                "addManager": "Add Manager",
+                "managerList": "Manager List",
+                
+                // Books
+                "bookManagement": "Book Management",
+                "title": "Title",
+                "author": "Author",
+                "isbn": "ISBN",
+                "category": "Category",
+                "addBook": "Add Book",
+                "bookInventory": "Book Inventory",
+                "status": "Status",
+                
+                // Common
+                "id": "ID",
+                "name": "Name",
+                "course": "Course",
+                "actions": "Actions",
+                "librarySystem": "Library Management System",
+                
+                // Cloud Features
+                "cloudFeatures": "Cloud Features",
+                "multiTenant": "Multi-Tenant Architecture",
+                "multiTenantDesc": "Support for multiple libraries with isolated data and configurations.",
+                "multiLanguage": "Multi-Language Support",
+                "multiLanguageDesc": "Interface available in multiple languages for global accessibility.",
+                "highPerformance": "High Performance",
+                "highPerformanceDesc": "Optimized for large datasets with efficient memory management.",
+                "dataSecurity": "Data Security",
+                "dataSecurityDesc": "Advanced encryption and security protocols for data protection.",
+                "autoScaling": "Auto Scaling",
+                "autoScalingDesc": "Automatically scales resources based on demand and usage patterns.",
+                "bigData": "Big Data Ready",
+                "bigDataDesc": "Handles large volumes of data with optimized storage and retrieval.",
+                
+                // Settings
+                "settings": "Settings",
+                "systemSettings": "System Settings",
+                "theme": "Theme",
+                "lightMode": "Light Mode",
+                "darkMode": "Dark Mode",
+                "dataManagement": "Data Management",
+                "exportData": "Export Data",
+                "importData": "Import Data",
+                "systemInfo": "System Information",
+                "version": "Version",
+                "lastBackup": "Last Backup",
+                "storageUsed": "Storage Used"
+            },
+            es: {
+                // Dashboard
+                "dashboard": "Panel de Control",
+                "totalStudents": "Total Estudiantes",
+                "totalManagers": "Total Administradores",
+                "totalBooks": "Total Libros",
+                "borrowedBooks": "Libros Prestados",
+                
+                // Students
+                "studentManagement": "Gestión de Estudiantes",
+                "fullName": "Nombre Completo",
+                "studentId": "ID Estudiante",
+                "email": "Correo Electrónico",
+                "courseProgram": "Curso/Programa",
+                "addStudent": "Agregar Estudiante",
+                "studentList": "Lista de Estudiantes",
+                
+                // Managers
+                "managerManagement": "Gestión de Administradores",
+                "managerId": "ID Administrador",
+                "department": "Departamento",
+                "addManager": "Agregar Administrador",
+                "managerList": "Lista de Administradores",
+                
+                // Books
+                "bookManagement": "Gestión de Libros",
+                "title": "Título",
+                "author": "Autor",
+                "isbn": "ISBN",
+                "category": "Categoría",
+                "addBook": "Agregar Libro",
+                "bookInventory": "Inventario de Libros",
+                "status": "Estado",
+                
+                // Common
+                "id": "ID",
+                "name": "Nombre",
+                "course": "Curso",
+                "actions": "Acciones",
+                "librarySystem": "Sistema de Gestión de Biblioteca",
+                
+                // Cloud Features
+                "cloudFeatures": "Características de la Nube",
+                "multiTenant": "Arquitectura Multiinquilino",
+                "multiTenantDesc": "Soporte para múltiples bibliotecas con datos y configuraciones aislados.",
+                "multiLanguage": "Soporte Multilingüe",
+                "multiLanguageDesc": "Interfaz disponible en varios idiomas para accesibilidad global.",
+                "highPerformance": "Alto Rendimiento",
+                "highPerformanceDesc": "Optimizado para grandes conjuntos de datos con gestión eficiente de memoria.",
+                "dataSecurity": "Seguridad de Datos",
+                "dataSecurityDesc": "Protocolos avanzados de cifrado y seguridad para la protección de datos.",
+                "autoScaling": "Escalado Automático",
+                "autoScalingDesc": "Escala automáticamente los recursos según la demanda y los patrones de uso.",
+                "bigData": "Preparado para Big Data",
+                "bigDataDesc": "Maneja grandes volúmenes de datos con almacenamiento y recuperación optimizados.",
+                
+                // Settings
+                "settings": "Configuración",
+                "systemSettings": "Configuración del Sistema",
+                "theme": "Tema",
+                "lightMode": "Modo Claro",
+                "darkMode": "Modo Oscuro",
+                "dataManagement": "Gestión de Datos",
+                "exportData": "Exportar Datos",
+                "importData": "Importar Datos",
+                "systemInfo": "Información del Sistema",
+                "version": "Versión",
+                "lastBackup": "Última Copia de Seguridad",
+                "storageUsed": "Almacenamiento Utilizado"
+            },
+            fr: {
+                // Dashboard
+                "dashboard": "Tableau de Bord",
+                "totalStudents": "Total Étudiants",
+                "totalManagers": "Total Gestionnaires",
+                "totalBooks": "Total Livres",
+                "borrowedBooks": "Livres Empruntés",
+                
+                // Students
+                "studentManagement": "Gestion des Étudiants",
+                "fullName": "Nom Complet",
+                "studentId": "ID Étudiant",
+                "email": "E-mail",
+                "courseProgram": "Cours/Programme",
+                "addStudent": "Ajouter un Étudiant",
+                "studentList": "Liste des Étudiants",
+                
+                // Managers
+                "managerManagement": "Gestion des Gestionnaires",
+                "managerId": "ID Gestionnaire",
+                "department": "Département",
+                "addManager": "Ajouter un Gestionnaire",
+                "managerList": "Liste des Gestionnaires",
+                
+                // Books
+                "bookManagement": "Gestion des Livres",
+                "title": "Titre",
+                "author": "Auteur",
+                "isbn": "ISBN",
+                "category": "Catégorie",
+                "addBook": "Ajouter un Livre",
+                "bookInventory": "Inventaire des Livres",
+                "status": "Statut",
+                
+                // Common
+                "id": "ID",
+                "name": "Nom",
+                "course": "Cours",
+                "actions": "Actions",
+                "librarySystem": "Système de Gestion de Bibliothèque",
+                
+                // Cloud Features
+                "cloudFeatures": "Fonctionnalités Cloud",
+                "multiTenant": "Architecture Multi-locataire",
+                "multiTenantDesc": "Prise en charge de plusieurs bibliothèques avec des données et configurations isolées.",
+                "multiLanguage": "Prise en charge multilingue",
+                "multiLanguageDesc": "Interface disponible en plusieurs langues pour une accessibilité mondiale.",
+                "highPerformance": "Haute Performance",
+                "highPerformanceDesc": "Optimisé pour les grands ensembles de données avec une gestion efficace de la mémoire.",
+                "dataSecurity": "Sécurité des Données",
+                "dataSecurityDesc": "Protocoles de chiffrement et de sécurité avancés pour la protection des données.",
+                "autoScaling": "Mise à l'échelle Automatique",
+                "autoScalingDesc": "Met automatiquement à l'échelle les ressources en fonction de la demande et des modèles d'utilisation.",
+                "bigData": "Prêt pour le Big Data",
+                "bigDataDesc": "Gère de grands volumes de données avec un stockage et une récupération optimisés.",
+                
+                // Settings
+                "settings": "Paramètres",
+                "systemSettings": "Paramètres Système",
+                "theme": "Thème",
+                "lightMode": "Mode Clair",
+                "darkMode": "Mode Sombre",
+                "dataManagement": "Gestion des Données",
+                "exportData": "Exporter les Données",
+                "importData": "Importer les Données",
+                "systemInfo": "Informations Système",
+                "version": "Version",
+                "lastBackup": "Dernière Sauvegarde",
+                "storageUsed": "Stockage Utilisé"
+            },
+            de: {
+                // Dashboard
+                "dashboard": "Dashboard",
+                "totalStudents": "Gesamte Studenten",
+                "totalManagers": "Gesamte Manager",
+                "totalBooks": "Gesamte Bücher",
+                "borrowedBooks": "Ausgeliehene Bücher",
+                
+                // Students
+                "studentManagement": "Studentenverwaltung",
+                "fullName": "Vollständiger Name",
+                "studentId": "Studenten-ID",
+                "email": "E-Mail",
+                "courseProgram": "Kurs/Programm",
+                "addStudent": "Student Hinzufügen",
+                "studentList": "Studentenliste",
+                
+                // Managers
+                "managerManagement": "Managerverwaltung",
+                "managerId": "Manager-ID",
+                "department": "Abteilung",
+                "addManager": "Manager Hinzufügen",
+                "managerList": "Managerliste",
+                
+                // Books
+                "bookManagement": "Buchverwaltung",
+                "title": "Titel",
+                "author": "Autor",
+                "isbn": "ISBN",
+                "category": "Kategorie",
+                "addBook": "Buch Hinzufügen",
+                "bookInventory": "Buchbestand",
+                "status": "Status",
+                
+                // Common
+                "id": "ID",
+                "name": "Name",
+                "course": "Kurs",
+                "actions": "Aktionen",
+                "librarySystem": "Bibliotheksverwaltungssystem",
+                
+                // Cloud Features
+                "cloudFeatures": "Cloud-Funktionen",
+                "multiTenant": "Multi-Mandanten-Architektur",
+                "multiTenantDesc": "Unterstützung mehrerer Bibliotheken mit isolierten Daten und Konfigurationen.",
+                "multiLanguage": "Mehrsprachige Unterstützung",
+                "multiLanguageDesc": "Oberfläche in mehreren Sprachen für globale Zugänglichkeit verfügbar.",
+                "highPerformance": "Hohe Leistung",
+                "highPerformanceDesc": "Optimiert für große Datensätze mit effizienter Speicherverwaltung.",
+                "dataSecurity": "Datensicherheit",
+                "dataSecurityDesc": "Erweiterte Verschlüsselungs- und Sicherheitsprotokolle zum Schutz von Daten.",
+                "autoScaling": "Automatische Skalierung",
+                "autoScalingDesc": "Skaliert Ressourcen automatisch basierend auf Nachfrage und Nutzungsmustern.",
+                "bigData": "Big Data Bereit",
+                "bigDataDesc": "Verarbeitet große Datenmengen mit optimierter Speicherung und Abruf.",
+                
+                // Settings
+                "settings": "Einstellungen",
+                "systemSettings": "Systemeinstellungen",
+                "theme": "Thema",
+                "lightMode": "Hellmodus",
+                "darkMode": "Dunkelmodus",
+                "dataManagement": "Datenverwaltung",
+                "exportData": "Daten Exportieren",
+                "importData": "Daten Importieren",
+                "systemInfo": "Systeminformationen",
+                "version": "Version",
+                "lastBackup": "Letzte Sicherung",
+                "storageUsed": "Verwendeter Speicher"
+            },
+            zh: {
+                // Dashboard
+                "dashboard": "仪表板",
+                "totalStudents": "学生总数",
+                "totalManagers": "管理员总数",
+                "totalBooks": "图书总数",
+                "borrowedBooks": "已借图书",
+                
+                // Students
+                "studentManagement": "学生管理",
+                "fullName": "全名",
+                "studentId": "学生ID",
+                "email": "电子邮件",
+                "courseProgram": "课程/项目",
+                "addStudent": "添加学生",
+                "studentList": "学生列表",
+                
+                // Managers
+                "managerManagement": "管理员管理",
+                "managerId": "管理员ID",
+                "department": "部门",
+                "addManager": "添加管理员",
+                "managerList": "管理员列表",
+                
+                // Books
+                "bookManagement": "图书管理",
+                "title": "标题",
+                "author": "作者",
+                "isbn": "ISBN",
+                "category": "类别",
+                "addBook": "添加图书",
+                "bookInventory": "图书库存",
+                "status": "状态",
+                
+                // Common
+                "id": "ID",
+                "name": "姓名",
+                "course": "课程",
+                "actions": "操作",
+                "librarySystem": "图书馆管理系统",
+                
+                // Cloud Features
+                "cloudFeatures": "云功能",
+                "multiTenant": "多租户架构",
+                "multiTenantDesc": "支持多个图书馆，具有隔离的数据和配置。",
+                "multiLanguage": "多语言支持",
+                "multiLanguageDesc": "界面提供多种语言，实现全球可访问性。",
+                "highPerformance": "高性能",
+                "highPerformanceDesc": "针对大数据集进行优化，具有高效的内存管理。",
+                "dataSecurity": "数据安全",
+                "dataSecurityDesc": "采用先进的加密和安全协议保护数据。",
+                "autoScaling": "自动扩展",
+                "autoScalingDesc": "根据需求和用量模式自动扩展资源。",
+                "bigData": "支持大数据",
+                "bigDataDesc": "处理大量数据，具有优化的存储和检索功能。",
+                
+                // Settings
+                "settings": "设置",
+                "systemSettings": "系统设置",
+                "theme": "主题",
+                "lightMode": "浅色模式",
+                "darkMode": "深色模式",
+                "dataManagement": "数据管理",
+                "exportData": "导出数据",
+                "importData": "导入数据",
+                "systemInfo": "系统信息",
+                "version": "版本",
+                "lastBackup": "最后备份",
+                "storageUsed": "已用存储"
+            }
+        };
+
+        // Data storage with tenant support
+        let currentTenant = 'default';
+        let tenants = JSON.parse(localStorage.getItem('tenants')) || { 'default': { name: 'Main Library' } };
+        let students = JSON.parse(localStorage.getItem(`students_${currentTenant}`)) || [];
+        let managers = JSON.parse(localStorage.getItem(`managers_${currentTenant}`)) || [];
+        let books = JSON.parse(localStorage.getItem(`books_${currentTenant}`)) || [];
+
+        // Current language
+        let currentLanguage = 'en';
+
+        // Initialize the application
+        function init() {
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Render initial data
+            renderStudents();
+            renderManagers();
+            renderBooks();
+            updateDashboard();
+            
+            // Apply saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.getElementById('theme-selector').value = savedTheme;
+            applyTheme(savedTheme);
+            
+            // Apply saved language
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            changeLanguage(savedLanguage);
+            
+            // Update system info
+            updateSystemInfo();
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tab = this.getAttribute('data-tab');
+                    openTab(tab);
+                    
+                    // Update active state
+                    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Language selector
+            document.querySelectorAll('.language-flag').forEach(flag => {
+                flag.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    changeLanguage(lang);
+                    
+                    // Update active state
+                    document.querySelectorAll('.language-flag').forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Form submissions
+            document.getElementById('student-form').addEventListener('submit', handleStudentSubmit);
+            document.getElementById('manager-form').addEventListener('submit', handleManagerSubmit);
+            document.getElementById('book-form').addEventListener('submit', handleBookSubmit);
+            
+            // Theme selector
+            document.getElementById('theme-selector').addEventListener('change', function() {
+                applyTheme(this.value);
+            });
+            
+            // Data management buttons
+            document.getElementById('export-data').addEventListener('click', exportData);
+            document.getElementById('import-data').addEventListener('click', importData);
+        }
+
+        // Change application language
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            
+            // Update all text elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update page title
+            document.title = translations[lang]?.librarySystem || 'Library Management System';
+        }
+
+        // Apply theme to the application
+        function applyTheme(theme) {
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+
+        // Tab navigation
+        function openTab(tabName) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Update dashboard statistics
+        function updateDashboard() {
+            document.getElementById('total-students').textContent = students.length;
+            document.getElementById('total-managers').textContent = managers.length;
+            document.getElementById('total-books').textContent = books.length;
+            
+            const borrowedBooks = books.filter(book => book.status === 'Borrowed').length;
+            document.getElementById('borrowed-books').textContent = borrowedBooks;
+        }
+
+        // Student form handling
+        function handleStudentSubmit(e) {
+            e.preventDefault();
+            
+            const student = {
+                id: document.getElementById('student-id').value,
+                name: document.getElementById('student-name').value,
+                email: document.getElementById('student-email').value,
+                course: document.getElementById('student-course').value
+            };
+            
+            students.push(student);
+            localStorage.setItem(`students_${currentTenant}`, JSON.stringify(students));
+            
+            this.reset();
+            renderStudents();
+            updateDashboard();
+            alert(getTranslatedMessage('Student added successfully!'));
+        }
+
+        // Manager form handling
+        function handleManagerSubmit(e) {
+            e.preventDefault();
+            
+            const manager = {
+                id: document.getElementById('manager-id').value,
+                name: document.getElementById('manager-name').value,
+                email: document.getElementById('manager-email').value,
+                department: document.getElementById('manager-department').value
+            };
+            
+            managers.push(manager);
+            localStorage.setItem(`managers_${currentTenant}`, JSON.stringify(managers));
+            
+            this.reset();
+            renderManagers();
+            updateDashboard();
+            alert(getTranslatedMessage('Manager added successfully!'));
+        }
+
+        // Book form handling
+        function handleBookSubmit(e) {
+            e.preventDefault();
+            
+            const book = {
+                isbn: document.getElementById('book-isbn').value,
+                title: document.getElementById('book-title').value,
+                author: document.getElementById('book-author').value,
+                category: document.getElementById('book-category').value,
+                status: 'Available'
+            };
+            
+            books.push(book);
+            localStorage.setItem(`books_${currentTenant}`, JSON.stringify(books));
+            
+            this.reset();
+            renderBooks();
+            updateDashboard();
+            alert(getTranslatedMessage('Book added successfully!'));
+        }
+
+        // Render students table
+        function renderStudents() {
+            const tbody = document.querySelector('#students-table tbody');
+            tbody.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.email}</td>
+                    <td>${student.course}</td>
+                    <td>
+                        <button class="action-btn" onclick="editStudent(${index})"><i class="fas fa-edit"></i> ${getTranslatedMessage('Edit')}</button>
+                        <button class="action-btn delete-btn" onclick="deleteStudent(${index})"><i class="fas fa-trash"></i> ${getTranslatedMessage('Delete')}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render managers table
+        function renderManagers() {
+            const tbody = document.querySelector('#managers-table tbody');
+            tbody.innerHTML = '';
+            
+            managers.forEach((manager, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${manager.id}</td>
+                    <td>${manager.name}</td>
+                    <td>${manager.email}</td>
+                    <td>${manager.department}</td>
+                    <td>
+                        <button class="action-btn" onclick="editManager(${index})"><i class="fas fa-edit"></i> ${getTranslatedMessage('Edit')}</button>
+                        <button class="action-btn delete-btn" onclick="deleteManager(${index})"><i class="fas fa-trash"></i> ${getTranslatedMessage('Delete')}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render books table
+        function renderBooks() {
+            const tbody = document.querySelector('#books-table tbody');
+            tbody.innerHTML = '';
+            
+            books.forEach((book, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${book.isbn}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.category}</td>
+                    <td>${book.status}</td>
+                    <td>
+                        <button class="action-btn" onclick="toggleBookStatus(${index})">
+                            <i class="fas fa-exchange-alt"></i> ${book.status === 'Available' ? getTranslatedMessage('Borrow') : getTranslatedMessage('Return')}
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteBook(${index})"><i class="fas fa-trash"></i> ${getTranslatedMessage('Delete')}</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Delete a student
+        function deleteStudent(index) {
+            if (confirm(getTranslatedMessage('Are you sure you want to delete this student?'))) {
+                students.splice(index, 1);
+                localStorage.setItem(`students_${currentTenant}`, JSON.stringify(students));
+                renderStudents();
+                updateDashboard();
+            }
+        }
+
+        // Delete a manager
+        function deleteManager(index) {
+            if (confirm(getTranslatedMessage('Are you sure you want to delete this manager?'))) {
+                managers.splice(index, 1);
+                localStorage.setItem(`managers_${currentTenant}`, JSON.stringify(managers));
+                renderManagers();
+                updateDashboard();
+            }
+        }
+
+        // Delete a book
+        function deleteBook(index) {
+            if (confirm(getTranslatedMessage('Are you sure you want to delete this book?'))) {
+                books.splice(index, 1);
+                localStorage.setItem(`books_${currentTenant}`, JSON.stringify(books));
+                renderBooks();
+                updateDashboard();
+            }
+        }
+
+        // Toggle book status (Available/Borrowed)
+        function toggleBookStatus(index) {
+            books[index].status = books[index].status === 'Available' ? 'Borrowed' : 'Available';
+            localStorage.setItem(`books_${currentTenant}`, JSON.stringify(books));
+            renderBooks();
+            updateDashboard();
+        }
+
+        // Export data function
+        function exportData() {
+            const data = {
+                students,
+                managers,
+                books,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `library_data_${currentTenant}_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            // Update last backup
+            document.getElementById('last-backup').textContent = new Date().toLocaleString();
+            alert(getTranslatedMessage('Data exported successfully!'));
+        }
+
+        // Import data function
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (data.students && data.managers && data.books) {
+                            students = data.students;
+                            managers = data.managers;
+                            books = data.books;
+                            
+                            localStorage.setItem(`students_${currentTenant}`, JSON.stringify(students));
+                            localStorage.setItem(`managers_${currentTenant}`, JSON.stringify(managers));
+                            localStorage.setItem(`books_${currentTenant}`, JSON.stringify(books));
+                            
+                            renderStudents();
+                            renderManagers();
+                            renderBooks();
+                            updateDashboard();
+                            updateSystemInfo();
+                            
+                            alert(getTranslatedMessage('Data imported successfully!'));
+                        } else {
+                            alert(getTranslatedMessage('Invalid data format!'));
+                        }
+                    } catch (err) {
+                        alert(getTranslatedMessage('Error reading file!'));
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+
+        // Update system information
+        function updateSystemInfo() {
+            // Calculate storage used
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length * 2; // Approximate size in bytes
+                }
+            }
+            
+            const sizeInKB = Math.round(totalSize / 1024);
+            document.getElementById('storage-used').textContent = `${sizeInKB} KB`;
+        }
+
+        // Helper function to get translated messages (simplified)
+        function getTranslatedMessage(message) {
+            // In a real application, you would have a more comprehensive translation system
+            const messageMap = {
+                'en': {
+                    'Student added successfully!': 'Student added successfully!',
+                    'Manager added successfully!': 'Manager added successfully!',
+                    'Book added successfully!': 'Book added successfully!',
+                    'Are you sure you want to delete this student?': 'Are you sure you want to delete this student?',
+                    'Are you sure you want to delete this manager?': 'Are you sure you want to delete this manager?',
+                    'Are you sure you want to delete this book?': 'Are you sure you want to delete this book?',
+                    'Edit': 'Edit',
+                    'Delete': 'Delete',
+                    'Borrow': 'Borrow',
+                    'Return': 'Return',
+                    'Data exported successfully!': 'Data exported successfully!',
+                    'Data imported successfully!': 'Data imported successfully!',
+                    'Invalid data format!': 'Invalid data format!',
+                    'Error reading file!': 'Error reading file!'
+                },
+                'es': {
+                    'Student added successfully!': '¡Estudiante agregado exitosamente!',
+                    'Manager added successfully!': '¡Administrador agregado exitosamente!',
+                    'Book added successfully!': '¡Libro agregado exitosamente!',
+                    'Are you sure you want to delete this student?': '¿Estás seguro de que quieres eliminar este estudiante?',
+                    'Are you sure you want to delete this manager?': '¿Estás seguro de que quieres eliminar este administrador?',
+                    'Are you sure you want to delete this book?': '¿Estás seguro de que quieres eliminar este libro?',
+                    'Edit': 'Editar',
+                    'Delete': 'Eliminar',
+                    'Borrow': 'Prestar',
+                    'Return': 'Devolver',
+                    'Data exported successfully!': '¡Datos exportados exitosamente!',
+                    'Data imported successfully!': '¡Datos importados exitosamente!',
+                    'Invalid data format!': '¡Formato de datos inválido!',
+                    'Error reading file!': '¡Error al leer el archivo!'
+                }
+                // Add more languages as needed
+            };
+            
+            return (messageMap[currentLanguage] && messageMap[currentLanguage][message]) || message;
+        }
+
+        // Run initialization when page loads
+        window.onload = init;
+    </script>
+</body>
+</html>
