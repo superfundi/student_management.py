@@ -83,11 +83,20 @@ def _prompt_non_empty(message: str) -> str:
         print("Value cannot be empty.")
 
 
+def _parse_positive_int(raw: str) -> int | None:
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return value if value > 0 else None
+
+
 def _prompt_int(message: str) -> int:
     while True:
         raw = input(message).strip()
-        if raw.isdecimal() and int(raw) > 0:
-            return int(raw)
+        value = _parse_positive_int(raw)
+        if value is not None:
+            return value
         print("Please enter a valid positive number.")
 
 
@@ -125,7 +134,7 @@ Student Management System
             student_id = _prompt_non_empty("Student ID: ")
             student = sms.get_student(student_id)
             if student:
-                print(asdict(student))
+                print(json.dumps(asdict(student), indent=2))
             else:
                 print("Student not found.")
 
@@ -135,7 +144,7 @@ Student Management System
                 print("No students found.")
             else:
                 for student in students:
-                    print(asdict(student))
+                    print(json.dumps(asdict(student), indent=2))
 
         elif choice == "4":
             student_id = _prompt_non_empty("Student ID to update: ")
@@ -146,16 +155,11 @@ Student Management System
             print("Leave a field blank to keep the current value.")
             name = input("New name: ").strip() or None
             age_raw = input("New age: ").strip()
-            age = None
             invalid_age = False
-            if age_raw.isdecimal():
-                age_value = int(age_raw)
-                if age_value > 0:
-                    age = age_value
-                else:
-                    invalid_age = True
-            elif age_raw:
-                invalid_age = True
+            age = None
+            if age_raw:
+                age = _parse_positive_int(age_raw)
+                invalid_age = age is None
             grade = input("New grade: ").strip() or None
             email = input("New email: ").strip() or None
 
