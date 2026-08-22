@@ -26,6 +26,9 @@ class StudentManagementSystem:
             return
         try:
             raw = json.loads(self.data_file.read_text(encoding="utf-8"))
+            if not isinstance(raw, list):
+                self.students = {}
+                return
             for item in raw:
                 student = Student(**item)
                 self.students[student.student_id] = student
@@ -51,6 +54,7 @@ class StudentManagementSystem:
         for field_name, value in updates.items():
             if field_name not in valid_fields:
                 return False
+        for field_name, value in updates.items():
             if value is not None:
                 setattr(student, field_name, value)
         self._save()
@@ -149,8 +153,10 @@ Student Management System
             grade = input("New grade: ").strip() or None
             email = input("New email: ").strip() or None
 
-            sms.update_student(student_id, name=name, age=age, grade=grade, email=email)
-            print("Student updated successfully.")
+            if sms.update_student(student_id, name=name, age=age, grade=grade, email=email):
+                print("Student updated successfully.")
+            else:
+                print("Failed to update student.")
 
         elif choice == "5":
             student_id = _prompt_non_empty("Student ID to delete: ")
