@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <Fundi charset="UTF-8">
-    <Fundi name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
     <style>
         * {
@@ -366,6 +366,62 @@
         let managers = JSON.parse(localStorage.getItem('managers')) || [];
         let books = JSON.parse(localStorage.getItem('books')) || [];
 
+        // Data cleaning helpers
+        function cleanText(value) {
+            return String(value ?? '').replace(/\s+/g, ' ').trim();
+        }
+
+        function cleanEmail(value) {
+            return cleanText(value).toLowerCase();
+        }
+
+        function cleanIdentifier(value) {
+            return cleanText(value).replace(/[^a-zA-Z0-9-]/g, '');
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function normalizeStudent(student) {
+            return {
+                id: cleanIdentifier(student.id),
+                name: cleanText(student.name),
+                email: cleanEmail(student.email),
+                course: cleanText(student.course)
+            };
+        }
+
+        function normalizeManager(manager) {
+            return {
+                id: cleanIdentifier(manager.id),
+                name: cleanText(manager.name),
+                email: cleanEmail(manager.email),
+                department: cleanText(manager.department)
+            };
+        }
+
+        function normalizeBook(book) {
+            return {
+                isbn: cleanIdentifier(book.isbn),
+                title: cleanText(book.title),
+                author: cleanText(book.author),
+                category: cleanText(book.category),
+                status: book.status === 'Borrowed' ? 'Borrowed' : 'Available'
+            };
+        }
+
+        function hasAllFields(record) {
+            return Object.values(record).every(
+                value => value !== null && value !== undefined && String(value).trim() !== ''
+            );
+        }
+
         // Tab navigation
         function openTab(tabName) {
             const tabContents = document.getElementsByClassName('tab-content');
@@ -401,12 +457,17 @@
         document.getElementById('student-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const student = {
+            const student = normalizeStudent({
                 id: document.getElementById('student-id').value,
                 name: document.getElementById('student-name').value,
                 email: document.getElementById('student-email').value,
                 course: document.getElementById('student-course').value
-            };
+            });
+
+            if (!hasAllFields(student)) {
+                alert('Please provide valid student details.');
+                return;
+            }
             
             students.push(student);
             localStorage.setItem('students', JSON.stringify(students));
@@ -420,12 +481,17 @@
         document.getElementById('manager-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const manager = {
+            const manager = normalizeManager({
                 id: document.getElementById('manager-id').value,
                 name: document.getElementById('manager-name').value,
                 email: document.getElementById('manager-email').value,
                 department: document.getElementById('manager-department').value
-            };
+            });
+
+            if (!hasAllFields(manager)) {
+                alert('Please provide valid manager details.');
+                return;
+            }
             
             managers.push(manager);
             localStorage.setItem('managers', JSON.stringify(managers));
@@ -439,13 +505,18 @@
         document.getElementById('book-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const book = {
+            const book = normalizeBook({
                 isbn: document.getElementById('book-isbn').value,
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
                 category: document.getElementById('book-category').value,
                 status: 'Available'
-            };
+            });
+
+            if (!hasAllFields(book)) {
+                alert('Please provide valid book details.');
+                return;
+            }
             
             books.push(book);
             localStorage.setItem('books', JSON.stringify(books));
@@ -463,10 +534,10 @@
             students.forEach((student, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.name}</td>
-                    <td>${student.email}</td>
-                    <td>${student.course}</td>
+                    <td>${escapeHtml(student.id)}</td>
+                    <td>${escapeHtml(student.name)}</td>
+                    <td>${escapeHtml(student.email)}</td>
+                    <td>${escapeHtml(student.course)}</td>
                     <td>
                         <button class="action-btn" onclick="editStudent(${index})">Edit</button>
                         <button class="action-btn delete-btn" onclick="deleteStudent(${index})">Delete</button>
@@ -484,10 +555,10 @@
             managers.forEach((manager, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${manager.id}</td>
-                    <td>${manager.name}</td>
-                    <td>${manager.email}</td>
-                    <td>${manager.department}</td>
+                    <td>${escapeHtml(manager.id)}</td>
+                    <td>${escapeHtml(manager.name)}</td>
+                    <td>${escapeHtml(manager.email)}</td>
+                    <td>${escapeHtml(manager.department)}</td>
                     <td>
                         <button class="action-btn" onclick="editManager(${index})">Edit</button>
                         <button class="action-btn delete-btn" onclick="deleteManager(${index})">Delete</button>
@@ -505,11 +576,11 @@
             books.forEach((book, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${book.isbn}</td>
-                    <td>${book.title}</td>
-                    <td>${book.author}</td>
-                    <td>${book.category}</td>
-                    <td>${book.status}</td>
+                    <td>${escapeHtml(book.isbn)}</td>
+                    <td>${escapeHtml(book.title)}</td>
+                    <td>${escapeHtml(book.author)}</td>
+                    <td>${escapeHtml(book.category)}</td>
+                    <td>${escapeHtml(book.status)}</td>
                     <td>
                         <button class="action-btn" onclick="toggleBookStatus(${index})">
                             ${book.status === 'Available' ? 'Borrow' : 'Return'}
@@ -561,6 +632,29 @@
 
         // Initialize the application
         function init() {
+            const originalStudentsCount = students.length;
+            const originalManagersCount = managers.length;
+            const originalBooksCount = books.length;
+
+            students = students.map(normalizeStudent).filter(hasAllFields);
+            managers = managers.map(normalizeManager).filter(hasAllFields);
+            books = books.map(normalizeBook).filter(hasAllFields);
+
+            const droppedStudents = originalStudentsCount - students.length;
+            const droppedManagers = originalManagersCount - managers.length;
+            const droppedBooks = originalBooksCount - books.length;
+            const totalDropped = droppedStudents + droppedManagers + droppedBooks;
+
+            if (totalDropped > 0) {
+                console.warn(
+                    `Data cleaning removed invalid records: students=${droppedStudents}, managers=${droppedManagers}, books=${droppedBooks}.`
+                );
+            }
+
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('managers', JSON.stringify(managers));
+            localStorage.setItem('books', JSON.stringify(books));
+
             renderStudents();
             renderManagers();
             renderBooks();
@@ -572,6 +666,3 @@
     </script>
 </body>
 </html>
-
-
-
