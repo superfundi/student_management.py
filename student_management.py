@@ -147,13 +147,20 @@ Student Management System
             name = input("New name: ").strip() or None
             age_raw = input("New age: ").strip()
             age = None
+            invalid_age = False
             if age_raw.isdecimal():
                 age_value = int(age_raw)
                 if age_value > 0:
                     age = age_value
+                else:
+                    invalid_age = True
+            elif age_raw:
+                invalid_age = True
             grade = input("New grade: ").strip() or None
             email = input("New email: ").strip() or None
 
+            if invalid_age:
+                print("Invalid age input; age will remain unchanged.")
             if sms.update_student(student_id, name=name, age=age, grade=grade, email=email):
                 print("Student updated successfully.")
             else:
