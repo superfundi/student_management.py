@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import Dict, List
 
@@ -50,7 +50,7 @@ class StudentManagementSystem:
         student = self.students.get(student_id)
         if not student:
             return False
-        valid_fields = set(Student.__dataclass_fields__.keys())
+        valid_fields = {field.name for field in fields(Student)}
         valid_fields.discard("student_id")
         for field_name, value in updates.items():
             if field_name not in valid_fields:
@@ -162,7 +162,10 @@ Student Management System
             if invalid_age:
                 print("Invalid age input; age will remain unchanged.")
             if sms.update_student(student_id, name=name, age=age, grade=grade, email=email):
-                print("Student updated successfully.")
+                if invalid_age:
+                    print("Student updated successfully (age unchanged).")
+                else:
+                    print("Student updated successfully.")
             else:
                 print("Failed to update student.")
 
