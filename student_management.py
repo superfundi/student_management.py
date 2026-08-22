@@ -47,8 +47,11 @@ class StudentManagementSystem:
         student = self.students.get(student_id)
         if not student:
             return False
+        valid_fields = set(Student.__dataclass_fields__.keys())
         for field_name, value in updates.items():
-            if value is not None and hasattr(student, field_name):
+            if field_name not in valid_fields:
+                return False
+            if value is not None:
                 setattr(student, field_name, value)
         self._save()
         return True
@@ -125,8 +128,9 @@ Student Management System
             students = sms.list_students()
             if not students:
                 print("No students found.")
-            for student in students:
-                print(asdict(student))
+            else:
+                for student in students:
+                    print(asdict(student))
 
         elif choice == "4":
             student_id = _prompt_non_empty("Student ID to update: ")
@@ -137,7 +141,11 @@ Student Management System
             print("Leave a field blank to keep the current value.")
             name = input("New name: ").strip() or None
             age_raw = input("New age: ").strip()
-            age = int(age_raw) if age_raw.isdigit() and int(age_raw) > 0 else None
+            age = None
+            if age_raw.isdigit():
+                age_value = int(age_raw)
+                if age_value > 0:
+                    age = age_value
             grade = input("New grade: ").strip() or None
             email = input("New email: ").strip() or None
 
