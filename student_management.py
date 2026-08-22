@@ -51,6 +51,7 @@ class StudentManagementSystem:
         if not student:
             return False
         valid_fields = set(Student.__dataclass_fields__.keys())
+        valid_fields.discard("student_id")
         for field_name, value in updates.items():
             if field_name not in valid_fields:
                 return False
@@ -85,7 +86,7 @@ def _prompt_non_empty(message: str) -> str:
 def _prompt_int(message: str) -> int:
     while True:
         raw = input(message).strip()
-        if raw.isdigit() and int(raw) > 0:
+        if raw.isdecimal() and int(raw) > 0:
             return int(raw)
         print("Please enter a valid positive number.")
 
@@ -146,7 +147,7 @@ Student Management System
             name = input("New name: ").strip() or None
             age_raw = input("New age: ").strip()
             age = None
-            if age_raw.isdigit():
+            if age_raw.isdecimal():
                 age_value = int(age_raw)
                 if age_value > 0:
                     age = age_value
